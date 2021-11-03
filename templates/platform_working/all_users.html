@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% if lst %}
+    <ul>
+    {% for user in lst %}
+        <li><a href={% url 'platform_working:all_users' %}>{{ user }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No users are available.</p>
+{% endif %}
+</body>
+</html>
