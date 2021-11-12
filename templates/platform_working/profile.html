@@ -2,9 +2,108 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <title>Профиль пользователя</title>
 </head>
 <body>
-
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Title</th>
+      <th scope="col">Album</th>
+      <th scope="col">Author</th>
+    </tr>
+  </thead>
+    {% if lst %}
+        <tbody>
+        {% for item in lst %}
+            <tr>
+                <td>{{ item.song_title }}</td>
+                <td>{{ item.id_user__albums__album_title }}</td>
+                <td>{{ item.id_user__login }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    {% else %}
+        <p>No songs are available.</p>
+    {% endif %}
+</table>
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="songs-tab" data-bs-toggle="tab" data-bs-target="#songs"
+            type="button" role="tab" aria-controls="songs" aria-selected="true">Песни</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="albums-tab" data-bs-toggle="tab" data-bs-target="#albums"
+            type="button" role="tab" aria-controls="albums" aria-selected="false">Альбомы</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="playlists-tab" data-bs-toggle="tab" data-bs-target="#playlists"
+            type="button" role="tab" aria-controls="playlists" aria-selected="false">Плейлисты</button>
+  </li>
+</ul>
+<div class="tab-content" id="userProfile">
+  <div class="tab-pane fade show active" id="songs" role="tabpanel" aria-labelledby="songs-tab">
+      {% if songs %}
+          <ul class="list-unstyled">
+          {% for song in songs %}
+              <li>
+                  <div>
+                      <img src="http://alfaed.ru/wp-content/uploads/2015/07/obl15.png"
+                           alt="metallica" width="100" height="100">
+                      {{ song.song_title }}
+                  </div>
+              </li>
+              <li></li>
+          {% endfor %}
+          </ul>
+      {% else %}
+          <p>No songs are available.</p>
+      {% endif %}
+  </div>
+  <div class="tab-pane fade" id="albums" role="tabpanel" aria-labelledby="albums-tab">
+      {% if albums %}
+          <ul class="list-inline">
+              {% for album in albums %}
+                  <li class="list-inline-item">
+                      <img src="http://alfaed.ru/wp-content/uploads/2015/07/obl15.png"
+                           alt={{ album.album_title }} width="100" height="100">
+                      <p>
+                          <a href={% url "platform_working:playlist_list" album.id_album %} class="link-dark">
+                              {{ album.album_title }}
+                          </a>
+                      </p>
+                  </li>
+              {% endfor %}
+          </ul>
+      {% else %}
+          <p>No albums are available.</p>
+      {% endif %}
+  </div>
+  <div class="tab-pane fade" id="playlists" role="tabpanel" aria-labelledby="playlists-tab">
+      {% if playlists %}
+          <ul class="list-inline">
+              {% for playlist in playlists %}
+                  <li class="list-inline-item">
+                      <img src="https://cdn.pixabay.com/photo/2021/01/08/14/44/cd-5900095_1280.png"
+                           alt={{ playlist.playlist_title }} width="100" height="100">
+                      <p>
+                          <a href={% url "platform_working:playlist_list" playlist.id_playlist %} class="link-dark">
+                              {{ playlist.playlist_title }}
+                          </a>
+                      </p>
+                  </li>
+              {% endfor %}
+          </ul>
+      {% else %}
+          <p>No playlists are available.</p>
+      {% endif %}
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous">
+</script>
 </body>
 </html>
