@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.db.models import Q
 from .models import Songs
 from .models import Users
 from .models import Albums
@@ -44,6 +45,24 @@ def profile(request, user_id):
                   })
 
 
+def search(request):
+    query = request.GET.get('q')
+    users = get_user_by_login(request, query)
+    songs = get_songs_by_title(request, query)
+    albums = get_albums_by_title(request, query)
+    playlists = get_playlists_by_title(request, query)
+    groups = get_groups_by_title(request, query)
+    context = {
+        "users": users,
+        "songs": songs,
+        "albums": albums,
+        "playlists": playlists,
+        "groups": groups
+    }
+    return render(request, 'platform_working/user_search.html', context)
+
+
+
 def get_all_users(request):
     """
     вывод всех пользователей
@@ -57,8 +76,10 @@ def get_user_by_login(request, login):
     """
     поиск пользователей по логину
     """
-    res = Users.objects.filter(login=login).values('login', 'image')
-    return HttpResponse(res)
+    res = Users.objects.all().filter(
+        Q(login__icontains=login)
+    )
+    return res
 
 
 def create_user(request):
@@ -80,13 +101,24 @@ def get_all_songs(request):
 
 
 def get_songs_by_title(request, title):
-    res = Songs.objects.all().filter(song_title=title)
-    return HttpResponse(res)
+    res = Songs.objects.all().filter(
+        Q(song_title__icontains=title)
+    )
+    return res
 
 
 def get_songs_by_user_id(request, user_id):
     res = Songs.objects.all().filter(id_user=user_id)
     return res
+
+
+def get_song_by_id(request, song_id):
+    response = Songs.objects.all().filter(id_song=song_id)\
+        .values('song_title', 'image', 'time', 'genre', 'id_user__albums__album_title',
+                'id_user__playlists__playlist_title')
+    rev = Reviews.objects.all().filter(id_song=song_id).values('id_reviewer__login', 'text', 'date')
+    context = {'songs': response, "reviewers": rev}
+    return render(request, 'platform_working/song.html', context)
 
 
 def create_song(request):
@@ -106,11 +138,13 @@ def delete_song_by_id(request, song_id):
 
 def get_all_albums(request):
     response = Albums.objects.all()
-    return response
+    return HttpResponse(response)
 
 
 def get_albums_by_title(request, title):
-    res = Albums.objects.all().filter(album_title=title)
+    res = Albums.objects.all().filter(
+        Q(album_title__icontains=title)
+    )
     return res
 
 
@@ -126,11 +160,13 @@ def get_album_by_user_id(request, user_id):
 
 def get_all_playlists(request):
     res = Playlists.objects.all()
-    return res
+    return HttpResponse(res)
 
 
 def get_playlists_by_title(request, title):
-    res = Playlists.objects.all().filter(playlist_title=title)
+    res = Playlists.objects.all().filter(
+        Q(playlist_title__icontains=title)
+    )
     return res
 
 
@@ -145,7 +181,9 @@ def get_all_groups(request):
 
 
 def get_groups_by_title(request, title):
-    res = Groups.objects.all().filter(group_title=title)
+    res = Groups.objects.all().filter(
+        Q(group_title__icontains=title)
+    )
     return res
 
 
