@@ -35,46 +35,18 @@
             </div>
         </div>
     </nav>
-</header>
-<table class="table table-striped">
-    <thead>
-    <tr>
-        <th scope="col">Title</th>
-        <th scope="col">Album</th>
-        <th scope="col">Author</th>
-    </tr>
-    </thead>
-    {% if lst %}
-        <tbody>
-        {% for item in lst %}
-            <tr>
-                <td>{{ item.song_title }}</td>
-                <td>{{ item.id_user__albums__album_title }}</td>
-                <td>{{ item.id_user__login }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    {% else %}
-        <p>No songs are available.</p>
+    {% if user %}
+        <div align="center" style="background-color: bisque">
+            <img src="https://pixelbox.ru/wp-content/uploads/2021/05/ava-vk-animal-91.jpg"
+                 alt="user" width="70" height="70">
+            <p>
+            <h2>
+                {{ user.login }}
+            </h2>
+            </p>
+        </div>
     {% endif %}
-</table>
-<ul class="nav justify-content-center">
-    <li class="nav-item">
-        <a class="nav-link" href={% url "platform_working:all_users" %}>Пользователи</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">Песни</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">Альбомы</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">Плейлисты</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">Сообщества</a>
-    </li>
-</ul>
+</header>
 <ul class="nav nav-tabs" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
         <button class="nav-link active" id="songs-tab" data-bs-toggle="tab" data-bs-target="#songs"
@@ -91,6 +63,11 @@
                 type="button" role="tab" aria-controls="playlists" aria-selected="false">Плейлисты
         </button>
     </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="subs-tab" data-bs-toggle="tab" data-bs-target="#subs"
+                type="button" role="tab" aria-controls="subs" aria-selected="false">Подписки
+        </button>
+    </li>
 </ul>
 <div class="tab-content" id="userProfile">
     <div class="tab-pane fade show active" id="songs" role="tabpanel" aria-labelledby="songs-tab">
@@ -100,7 +77,7 @@
                     <li>
                         <div>
                             <img src="http://alfaed.ru/wp-content/uploads/2015/07/obl15.png"
-                                 alt="metallica" width="100" height="100">
+                                 alt="metallica" width="50" height="50">
                             {{ song.song_title }}
                         </div>
                     </li>
@@ -117,7 +94,7 @@
                 {% for album in albums %}
                     <li class="list-inline-item">
                         <img src="http://alfaed.ru/wp-content/uploads/2015/07/obl15.png"
-                             alt={{ album.album_title }} width="100" height="100">
+                             alt={{ album.album_title }} width="150" height="150">
                         <p>
                             <a href={% url "platform_working:album_list" album.id_album %} class="link-dark">
                                 {{ album.album_title }}
@@ -136,11 +113,36 @@
                 {% for playlist in playlists %}
                     <li class="list-inline-item">
                         <img src="https://cdn.pixabay.com/photo/2021/01/08/14/44/cd-5900095_1280.png"
-                             alt={{ playlist.playlist_title }} width="100" height="100">
+                             alt={{ playlist.playlist_title }} width="150" height="150">
                         <p>
                             <a href={% url "platform_working:playlist_list" playlist.id_playlist %} class="link-dark">
                                 {{ playlist.playlist_title }}
                             </a>
+                        </p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No playlists are available.</p>
+        {% endif %}
+    </div>
+    <div class="tab-pane fade" id="subs" role="tabpanel" aria-labelledby="subs-tab">
+        {% if subs %}
+            <ul class="list-inline">
+                {% for sub in subs %}
+                    <li>
+                        <p>
+                            {% if sub.id_group != null %}
+                                <a href={% url "platform_working:all_users" %} class="link-dark">
+                                    {{ sub.id_user__groups__group_title }}
+                                </a>
+                            {% else %}
+                                <img src="https://pixelbox.ru/wp-content/uploads/2021/05/ava-vk-animal-91.jpg"
+                                     alt="user" width="70" height="70">
+                                <a href={% url "platform_working:profile" sub.id_user %} class="link-dark">
+                                    {{ sub.id_user__login }}
+                                </a>
+                            {% endif %}
                         </p>
                     </li>
                 {% endfor %}

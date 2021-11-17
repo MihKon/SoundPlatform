@@ -36,15 +36,21 @@ def profile(request, user_id):
     songs = get_songs_by_user_id(request, user_id)
     albums = get_album_by_user_id(request, user_id)
     playlists = Playlists.objects.all().filter(id_user__playlists=user_id)
+    user = Users.objects.values('login').get(id_user=user_id)
+    subs = Subscriptions.objects.filter(id_follower=user_id).values('id_user__groups__group_title', 'id_user__login',
+                                                                    'id_user', 'id_group')
     return render(request, 'platform_working/profile.html',
                   context={
                       "lst": response,
                       "songs": songs,
                       "albums": albums,
-                      "playlists": playlists
+                      "playlists": playlists,
+                      "user": user,
+                      "subs": subs
                   })
 
 
+#  готово (и метод, и шаблон)
 def search(request):
     query = request.GET.get('q')
     users = get_user_by_login(request, query)
@@ -62,7 +68,7 @@ def search(request):
     return render(request, 'platform_working/user_search.html', context)
 
 
-
+#  готово (и метод, и шаблон)
 def get_all_users(request):
     """
     вывод всех пользователей
@@ -72,6 +78,7 @@ def get_all_users(request):
     return render(request, 'platform_working/all_users.html', context)
 
 
+#  используется
 def get_user_by_login(request, login):
     """
     поиск пользователей по логину
@@ -97,9 +104,10 @@ def get_all_songs(request):
     вывод всех песен
     """
     res = Songs.objects.all()
-    return HttpResponse(res)
+    return render(request, 'platform_working/all_songs.html', context={"lst": res})
 
 
+#  используется
 def get_songs_by_title(request, title):
     res = Songs.objects.all().filter(
         Q(song_title__icontains=title)
@@ -113,11 +121,16 @@ def get_songs_by_user_id(request, user_id):
 
 
 def get_song_by_id(request, song_id):
-    response = Songs.objects.all().filter(id_song=song_id)\
-        .values('song_title', 'image', 'time', 'genre', 'id_user__albums__album_title',
-                'id_user__playlists__playlist_title')
+    response = Songs.objects.filter(id_song=song_id).get()
     rev = Reviews.objects.all().filter(id_song=song_id).values('id_reviewer__login', 'text', 'date')
-    context = {'songs': response, "reviewers": rev}
+    title = Songs.objects.get(id_song=song_id)
+    user = Users.objects.filter(id_user=title.id_user.id_user).get()
+    albums = AlbumList.objects.filter(id_song=song_id).values('id_album__album_title', 'id_album')
+    mixes = PlaylistList.objects.filter(id_song=song_id).values('id_playlist__playlist_title', 'id_playlist')
+    time = response.time.strftime("%H:%M:%S")
+    date = Reviews.objects.get(id_song=song_id).date.strftime(u"")
+    context = {'song': response, 'reviews': rev, 'title': title, 'albums': albums,
+               'playlists': mixes, 'author': user, 'time': time}
     return render(request, 'platform_working/song.html', context)
 
 
@@ -133,7 +146,7 @@ def create_song(request):
 
 
 def delete_song_by_id(request, song_id):
-    song = Songs.objects.filter(id_song=song_id).delete()
+    Songs.objects.filter(id_song=song_id).delete()
 
 
 def get_all_albums(request):
@@ -141,6 +154,7 @@ def get_all_albums(request):
     return HttpResponse(response)
 
 
+#  используется
 def get_albums_by_title(request, title):
     res = Albums.objects.all().filter(
         Q(album_title__icontains=title)
@@ -158,11 +172,29 @@ def get_album_by_user_id(request, user_id):
     return res
 
 
+def create_album(request):
+    title = request.POST['title']
+    n_of_songs = request.POST['number']
+    genre = request.POST['genre']
+    date = request.POST['date']
+    time = request.POST['time']
+    des = request.POST['des']
+    id_user = request.user.id
+    album = Albums(album_title=title, number_of_songs=n_of_songs, genre=genre, date=date, time=time, description=des,
+                   id_user=id_user)
+    album.save()
+
+
+def delete_album_by_id(request, album_id):
+    Albums.objects.filter(id_album=album_id).delete()
+
+
 def get_all_playlists(request):
     res = Playlists.objects.all()
     return HttpResponse(res)
 
 
+#  используется
 def get_playlists_by_title(request, title):
     res = Playlists.objects.all().filter(
         Q(playlist_title__icontains=title)
@@ -175,11 +207,24 @@ def get_playlist_with_playlist_list(request, playlist_id):
     return HttpResponse(response)
 
 
+def create_playlist(request):
+    title = request.POST['title']
+    time = request.POST['time']
+    user = request.user.id
+    mix = Playlists(playlist_title=title, time=time, id_user=user)
+    mix.save()
+
+
+def delete_playlist_by_id(request, mix_id):
+    Playlists.objects.filter(id_playlist=mix_id).delete()
+
+
 def get_all_groups(request):
     response = Groups.objects.all()
     return HttpResponse(response)
 
 
+#  используется
 def get_groups_by_title(request, title):
     res = Groups.objects.all().filter(
         Q(group_title__icontains=title)
@@ -187,23 +232,75 @@ def get_groups_by_title(request, title):
     return res
 
 
+def create_group(request):
+    creator = Users.objects.filter(id_user=request.user.id).values('login')
+    title = request.POST['title']
+    des = request.POST['description']
+    user = request.user.id
+    group = Groups(creator=creator, group_title=title, description=des, id_user=user)
+    group.save()
+
+
+def delete_group_by_id(request, group_id):
+    Groups.objects.filter(id_group=group_id).delete()
+
+
 def get_users_by_group_id(request, group_id):
     res = Subscriptions.objects.all().\
-        values("id_follower__login", "id_follower_id", "id_follower__image").\
+        values("id_follower__login", "id_follower_id", "id_follower__image", "id_group").\
         filter(id_group=group_id)
     return res
 
 
-def get_reviews_of_user(request):
-    res = Reviews.objects.all().filter(id_reviewer=request.user.id)
+def get_reviews_of_user(request, user_id):
+    res = Reviews.objects.all().filter(id_reviewer=user_id)
     return res
 
 
-def get_subscriptions_of_user(request):
-    response = Subscriptions.objects.all().filter(id_follower=request.user.id)
+def create_review(request):
+    text = request.POST['text']
+    date = request.POST['date']
+    reviwer = request.user.id
+    song = request.POST['song']
+    user = request.POST['user']
+    rev = Reviews(text=text, date=date, id_reviewer=reviwer, id_song=song, id_user=user)
+    rev.save()
+
+
+def delete_review(request, review_id):
+    Reviews.objects.filter(id_review=review_id).delete()
+
+
+def get_subscriptions_of_user(request, user_id):
+    response = Subscriptions.objects.all().filter(id_follower=user_id)
     return response
 
 
-def get_reposts_of_user(request):
-    r = Reposts.objects.all().filter(id_reposter=request.user.id)
+def create_sub(request):
+    follower = request.user.id
+    group = request.POST['group']
+    user = request.POST['user']
+    sub = Subscriptions(id_follower=follower, id_group=group, id_user=user)
+    sub.save()
+
+
+def delete_sub(request, sub_id):
+    Subscriptions.objects.filter(id_subscription=sub_id).delete()
+
+
+def get_reposts_of_user(request, user_id):
+    r = Reposts.objects.all().filter(id_reposter=user_id)
     return r
+
+
+def create_repost(request):
+    text = request.POST['text']
+    song = request.POST['song']
+    reposter = request.user.id
+    user = request.POST['user']
+    repost = Reposts(text=text, id_song=song, id_reposter=reposter, id_user=user)
+    repost.save()
+
+
+def delete_repost(request, rep_id):
+    Reposts.objects.filter(id_repost=rep_id).delete()

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
-    <title>Результат поиска</title>
+    <title>Песни</title>
 </head>
 <body>
 <header>
@@ -41,28 +41,13 @@
     </nav>
 </header>
 <div>
-    {% if users %}
+    {% if lst %}
         <ul class="list-unstyled">
-            {% for user in users %}
-                <li>
-                    <div>
-                        <img src="https://pixelbox.ru/wp-content/uploads/2021/05/ava-vk-animal-91.jpg"
-                             alt="user" width="70" height="70">
-                        <a href={% url 'platform_working:profile' user.id_user %} class="link-dark">
-                            {{ user.login }}
-                        </a>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-    {% if songs %}
-        <ul class="list-unstyled">
-            {% for song in songs %}
+            {% for song in lst %}
                 <li>
                     <div>
                         <img src="https://tattoo-stickers.ru/34209-thickbox_default/skripichnyy-kluch.jpg"
-                             alt="song" width="50" height="50">
+                             alt="user" width="50" height="50">
                         <a href={% url 'platform_working:song' song.id_song %} class="link-dark">
                             {{ song.song_title }}
                         </a>
@@ -70,51 +55,8 @@
                 </li>
             {% endfor %}
         </ul>
-    {% endif %}
-    {% if albums %}
-        <ul class="list-unstyled">
-            {% for album in albums %}
-                <li>
-                    <div>
-                        <img src=""
-                             alt="album" width="150" height="150">
-                        <a href={% url 'platform_working:album_list' album.id_album %} class="link-dark">
-                            {{ album.album_title }}
-                        </a>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-    {% if playlists %}
-        <ul class="list-unstyled">
-            {% for mix in playlists %}
-                <li>
-                    <div>
-                        <img src=""
-                             alt="playlist" width="200" height="200">
-                        <a href={% url 'platform_working:playlist_list' mix.id_playlist %} class="link-dark">
-                            {{ mix.playlist_title }}
-                        </a>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-    {% if groups %}
-        <ul class="list-unstyled">
-            {% for group in groups %}
-                <li>
-                    <div>
-                        <img src=""
-                             alt="group" width="120" height="120">
-                        <a href={% url 'platform_working:all_users' %} class="link-dark">
-                            {{ group.group_title }}
-                        </a>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
+    {% else %}
+        <p>No songs are available.</p>
     {% endif %}
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"

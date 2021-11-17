@@ -5,26 +5,135 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
-    <title>Песня</title>
+    <title>Информация о песне</title>
 </head>
 <body>
-{% if songs %}
-    <ul class="list-unstyled">
-        {% for song in songs %}
-            <li>
-                {{ song.song_title }}
-                {% if reviewers %}
-                    {% for reviewer in reviewers %}
-                        {{ reviewer.id_reviewer__login }}
-                        {{ reviewer.text }}
-                        {{ reviewer.date }}
+<header>
+    <div style="background-color: cornflowerblue">
+        <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/418f0a68688713.5b65b8eda5782.png"
+             class="rounded mx-auto d-block" width="300" height="200">
+    </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="https://static-s.aa-cdn.net/img/gp/20600005690568/msPaM0DBaJ16mp8SbexZaO10WD18zek3PoYZ_NzOfp0q50wYQiY4R8DZZqRXQ9N5bnY4=w300?v=1"
+                     alt="" width="30" height="30">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="nav-link" aria-current="page" href={% url "platform_working:all_users" %}>Пользователи</a>
+                    <a class="nav-link" href={% url "platform_working:all_songs" %}>Песни</a>
+                    <a class="nav-link" href={% url "platform_working:all_albums" %}>Альбомы</a>
+                    <a class="nav-link" href={% url "platform_working:all_playlists" %}>Плейлисты</a>
+                    <a class="nav-link" href={% url "platform_working:all_groups" %}>Сообщества</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    {% if title %}
+        <div style="background-color: palegreen">
+            <img src="https://tattoo-stickers.ru/34209-thickbox_default/skripichnyy-kluch.jpg"
+                 alt="user" width="50" height="50">
+            <p>
+            <h2>
+                {{ title.song_title }}
+            </h2>
+            </p>
+            {% if author %}
+                <p>
+                    Автор:
+                    <img src="https://pixelbox.ru/wp-content/uploads/2021/05/ava-vk-animal-91.jpg"
+                         alt="user" width="30" height="30">
+                    <a href={% url 'platform_working:profile' author.id_user %} class="link-dark">
+                        {{ author.login }}
+                    </a>
+                </p>
+            {% endif %}
+        </div>
+    {% endif %}
+</header>
+<h1>player</h1>
+{% if song %}
+    <dl class="row">
+        <dt class="col-sm-3">Время</dt>
+        <dd class="col-sm-9">{{ time }}</dd>
+
+        <dt class="col-sm-3">Жанр</dt>
+        <dd class="col-sm-9">{{ song.genre }}</dd>
+        <dt class="col-sm-3">Альбомы</dt>
+        <dd class="col-sm-9">
+            {% if albums %}
+                <div>
+                    <ul class="list-inline">
+                        {% for album in albums %}
+                            <li class="list-inline-item">
+                                <img src="http://alfaed.ru/wp-content/uploads/2015/07/obl15.png"
+                                     alt={{ album.id_album__album_title }} width="100" height="100">
+                                <p>
+                                    <a href={% url "platform_working:album_list" album.id_album %} class="link-dark">
+                                        {{ album.id_album__album_title }}
+                                    </a>
+                                </p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% else %}
+                <h4>-----</h4>
+            {% endif %}
+        </dd>
+
+        <dt class="col-sm-3">Плейлисты</dt>
+        <dd class="col-sm-9">
+            {% if playlists %}
+                <ul class="list-inline">
+                    {% for playlist in playlists %}
+                        <li class="list-inline-item">
+                            <img src="https://cdn.pixabay.com/photo/2021/01/08/14/44/cd-5900095_1280.png"
+                                 alt={{ playlist.id_playlist__playlist_title }} width="100" height="100">
+                            <p>
+                                <a href={% url "platform_working:playlist_list" playlist.id_playlist %} class="link-dark">
+                                    {{ playlist.id_playlist__playlist_title }}
+                                </a>
+                            </p>
+                        </li>
                     {% endfor %}
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No songs are available.</p>
+                </ul>
+            {% else %}
+                <h4>-----</h4>
+            {% endif %}
+        </dd>
+
+        <dt class="col-sm-3">Отзывы</dt>
+        <dd class="col-sm-9">
+            {% if reviews %}
+                <ul class="list-unstyled">
+                    {% for review in reviews %}
+                        <li>
+                            <div>
+                                <figure>
+                                    <blockquote class="blockquote">
+                                        <p>{{ review.text }}</p>
+                                    </blockquote>
+                                    <figcaption class="blockquote-footer">
+                                        {{ review.id_reviewer__login }} <cite title="Date">{{ review.date }}</cite>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </li>
+                        <li></li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                Отзывов пока нет, будьте первыми!
+            {% endif %}
+        </dd>
+    </dl>
 {% endif %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous">
