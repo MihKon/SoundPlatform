@@ -6,11 +6,11 @@ from . import views
 app_name = 'platform_working'
 urlpatterns = [
     path('', views.index, name='index'),
-    path('users/', views.get_all_users, name='all_users'),
-    path('search/', views.search, name='user_search'),
-    path('users/profile/<int:user_id>/', views.profile, name='profile'),
-    path('songs/', views.get_all_songs, name='all_songs'),
-    path('songs/<int:song_id>/', views.get_song_by_id, name='song'),
+    path('users/', views.get_all_users, name='all_users'),  # готово
+    path('search/', views.search, name='user_search'),  # готово
+    path('users/profile/<int:user_id>/', views.profile, name='profile'),  # готово
+    path('songs/', views.get_all_songs, name='all_songs'),  # готово
+    path('songs/<int:song_id>/', views.get_song_by_id, name='song'),  # готово
     path('albums/', views.get_all_albums, name='all_albums'),
     path('albums/<int:album_id>/', views.get_album_with_album_list, name='album_list'),
     path('playlists/', views.get_all_playlists, name='all_playlists'),

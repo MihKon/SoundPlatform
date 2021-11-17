@@ -72,7 +72,7 @@
                     <ul class="list-inline">
                         {% for album in albums %}
                             <li class="list-inline-item">
-                                <img src="http://alfaed.ru/wp-content/uploads/2015/07/obl15.png"
+                                <img src="https://e7.pngegg.com/pngimages/291/730/png-clipart-computer-icons-album-music-music-box-classic-album-photography.png"
                                      alt={{ album.id_album__album_title }} width="100" height="100">
                                 <p>
                                     <a href={% url "platform_working:album_list" album.id_album %} class="link-dark">
@@ -121,7 +121,10 @@
                                         <p>{{ review.text }}</p>
                                     </blockquote>
                                     <figcaption class="blockquote-footer">
-                                        {{ review.id_reviewer__login }} <cite title="Date">{{ review.date }}</cite>
+                                        <a href={% url 'platform_working:profile' review.id_reviewer %} class="link-dark">
+                                            {{ review.id_reviewer__login }}
+                                        </a>
+                                        <cite title="Date">{{ review.date }}</cite>
                                     </figcaption>
                                 </figure>
                             </div>

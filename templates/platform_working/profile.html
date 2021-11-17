@@ -81,8 +81,8 @@
                 {% for song in songs %}
                     <li>
                         <div>
-                            <img src="http://alfaed.ru/wp-content/uploads/2015/07/obl15.png"
-                                 alt="metallica" width="50" height="50">
+                            <img src="https://tattoo-stickers.ru/34209-thickbox_default/skripichnyy-kluch.jpg"
+                                 alt="metallica" width="70" height="70">
                             <a href={% url 'platform_working:song' song.id_song %} class="link-dark">
                                 {{ song.song_title }}
                             </a>
@@ -100,8 +100,8 @@
             <ul class="list-inline">
                 {% for album in albums %}
                     <li class="list-inline-item">
-                        <img src="http://alfaed.ru/wp-content/uploads/2015/07/obl15.png"
-                             alt={{ album.album_title }} width="150" height="150">
+                        <img src="https://e7.pngegg.com/pngimages/291/730/png-clipart-computer-icons-album-music-music-box-classic-album-photography.png"
+                             alt={{ album.album_title }} width="100" height="100">
                         <p>
                             <a href={% url "platform_working:album_list" album.id_album %} class="link-dark">
                                 {{ album.album_title }}
@@ -120,7 +120,7 @@
                 {% for playlist in playlists %}
                     <li class="list-inline-item">
                         <img src="https://cdn.pixabay.com/photo/2021/01/08/14/44/cd-5900095_1280.png"
-                             alt={{ playlist.playlist_title }} width="150" height="150">
+                             alt={{ playlist.playlist_title }} width="100" height="100">
                         <p>
                             <a href={% url "platform_working:playlist_list" playlist.id_playlist %} class="link-dark">
                                 {{ playlist.playlist_title }}
@@ -140,6 +140,8 @@
                     <li>
                         <p>
                             {% if sub.id_group != null %}
+                                <img src="https://img.favpng.com/9/13/15/computer-icons-symbol-icon-design-png-favpng-dwyij4WSdArzhDxL0M9X6mejB.jpg"
+                                     alt="group" width="80" height="80">
                                 <a href={% url "platform_working:all_users" %} class="link-dark">
                                     {{ sub.id_user__groups__group_title }}
                                 </a>
