@@ -29,9 +29,9 @@ def profile(request, user_id):
     """
     в своём профиле авторизированный пользователь должен видеть все свои песни, подписки, альбомы, репосты
     """
-    response = Songs.objects\
-        .select_related('id_user').all()\
-        .values('song_title', 'id_user__login', 'id_user__albums__album_title')\
+    response = Songs.objects \
+        .select_related('id_user').all() \
+        .values('song_title', 'id_user__login', 'id_user__albums__album_title') \
         .filter(id_user=user_id)
     songs = get_songs_by_user_id(request, user_id)
     albums = get_album_by_user_id(request, user_id)
@@ -39,6 +39,15 @@ def profile(request, user_id):
     user = Users.objects.values('login').get(id_user=user_id)
     subs = Subscriptions.objects.filter(id_follower=user_id).values('id_user__groups__group_title', 'id_user__login',
                                                                     'id_user', 'id_group')
+    revs = Reviews.objects.filter(id_user=user_id)
+    lst = []
+    for rev in revs:
+        if rev.id_song is None:
+            reviews = Reviews.objects.all().filter(id_review=rev.id_review).values('id_reviewer__login', 'text', 'date',
+                                                                                   'id_song',
+                                                                                   'id_reviewer',
+                                                                                   'id_user__songs__song_title').get()
+            lst.append(reviews)
     return render(request, 'platform_working/profile.html',
                   context={
                       "lst": response,
@@ -46,7 +55,8 @@ def profile(request, user_id):
                       "albums": albums,
                       "playlists": playlists,
                       "user": user,
-                      "subs": subs
+                      "subs": subs,
+                      "reviews": lst
                   })
 
 
@@ -99,6 +109,7 @@ def create_user(request):
     u.save()
 
 
+#  готово (и метод, и шаблон)
 def get_all_songs(request):
     """
     вывод всех песен
@@ -120,6 +131,7 @@ def get_songs_by_user_id(request, user_id):
     return res
 
 
+#  готово (и метод, и шаблон)
 def get_song_by_id(request, song_id):
     response = Songs.objects.filter(id_song=song_id).get()
     rev = Reviews.objects.all().filter(id_song=song_id).values('id_reviewer__login', 'text', 'date')
@@ -128,7 +140,6 @@ def get_song_by_id(request, song_id):
     albums = AlbumList.objects.filter(id_song=song_id).values('id_album__album_title', 'id_album')
     mixes = PlaylistList.objects.filter(id_song=song_id).values('id_playlist__playlist_title', 'id_playlist')
     time = response.time.strftime("%H:%M:%S")
-    date = Reviews.objects.get(id_song=song_id).date.strftime(u"")
     context = {'song': response, 'reviews': rev, 'title': title, 'albums': albums,
                'playlists': mixes, 'author': user, 'time': time}
     return render(request, 'platform_working/song.html', context)
@@ -246,8 +257,8 @@ def delete_group_by_id(request, group_id):
 
 
 def get_users_by_group_id(request, group_id):
-    res = Subscriptions.objects.all().\
-        values("id_follower__login", "id_follower_id", "id_follower__image", "id_group").\
+    res = Subscriptions.objects.all(). \
+        values("id_follower__login", "id_follower_id", "id_follower__image", "id_group"). \
         filter(id_group=group_id)
     return res
 

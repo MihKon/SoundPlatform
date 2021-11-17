@@ -68,6 +68,11 @@
                 type="button" role="tab" aria-controls="subs" aria-selected="false">Подписки
         </button>
     </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews"
+                type="button" role="tab" aria-controls="reviews" aria-selected="false">Отзывы
+        </button>
+    </li>
 </ul>
 <div class="tab-content" id="userProfile">
     <div class="tab-pane fade show active" id="songs" role="tabpanel" aria-labelledby="songs-tab">
@@ -78,7 +83,9 @@
                         <div>
                             <img src="http://alfaed.ru/wp-content/uploads/2015/07/obl15.png"
                                  alt="metallica" width="50" height="50">
-                            {{ song.song_title }}
+                            <a href={% url 'platform_working:song' song.id_song %} class="link-dark">
+                                {{ song.song_title }}
+                            </a>
                         </div>
                     </li>
                     <li></li>
@@ -149,6 +156,31 @@
             </ul>
         {% else %}
             <p>No playlists are available.</p>
+        {% endif %}
+    </div>
+    <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+        {% if reviews %}
+            <ul class="list-unstyled">
+                {% for review in reviews %}
+                    <li>
+                        <div>
+                            <figure>
+                                <blockquote class="blockquote">
+                                    <p>{{ review.text }}</p>
+                                </blockquote>
+                                <figcaption class="blockquote-footer">
+                                    <a href={% url 'platform_working:profile' review.id_reviewer %} class="link-dark">
+                                        {{ review.id_reviewer__login }}</a> <cite
+                                        title="Date">{{ review.date }}</cite>
+                                </figcaption>
+                            </figure>
+                        </div>
+                    </li>
+                    <li></li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Отзывов пока нет, будьте первыми!</p>
         {% endif %}
     </div>
 </div>
