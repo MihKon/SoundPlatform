@@ -66,12 +66,13 @@
             <th scope="col">№</th>
             <th scope="col">Название</th>
             <th scope="col">Время</th>
+            <th scope="col">Пользователь</th>
         </tr>
         </thead>
         <tbody>
         {% for song in playlist %}
             <tr>
-                <td>{{ song.number }}</td>
+                <th scope="row">{{ song.number }}</th>
                 <td>
                     <a href={% url 'platform_working:song' song.id_song %} class="link-dark">
                         {{ song.song_title }}
@@ -79,6 +80,17 @@
                 </td>
                 {% load tags_extras %}
                 <td>{{ song.time|time }}</td>
+                {% if users %}
+                    {% for user in users %}
+                        {% if song.id_author == user.id_user %}
+                            <td>
+                                <a href={% url 'platform_working:profile' user.id_user %} class="link-dark">
+                                    {{ user.login }}
+                                </a>
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>

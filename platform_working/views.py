@@ -219,10 +219,17 @@ def get_playlists_by_title(request, title):
 
 
 def get_playlist_with_playlist_list(request, playlist_id):
-    response = PlaylistList.objects.all().filter(id_playlist=playlist_id)
+    response = PlaylistList.objects.all().filter(id_playlist=playlist_id).order_by('number')
     title = Playlists.objects.get(id_playlist=playlist_id).playlist_title
     author = Users.objects.get(id_user=Playlists.objects.get(id_playlist=playlist_id).id_user.id_user)
-    context = {"title": title, "author": author, "playlist": response}
+    lst = []
+    pl = PlaylistList.objects.filter(id_playlist=playlist_id).all()
+    for r in pl:
+        user_id = Songs.objects.get(id_song=r.id_song).id_user.id_user
+        user = Users.objects.get(id_user=user_id)
+        if lst.count(user) == 0:
+            lst.append(user)
+    context = {"title": title, "author": author, "playlist": response, "users": lst}
     return render(request, 'platform_working/playlists_lists.html', context=context)
 
 
