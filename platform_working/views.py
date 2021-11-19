@@ -174,8 +174,11 @@ def get_albums_by_title(request, title):
 
 
 def get_album_with_album_list(request, album_id):
-    res = AlbumList.objects.all().filter(id_album=album_id).values()
-    return HttpResponse(res)
+    res = AlbumList.objects.all().filter(id_album=album_id).order_by('number')
+    title = Albums.objects.get(id_album=album_id).album_title
+    author = Users.objects.get(id_user=Albums.objects.get(id_album=album_id).id_user.id_user)
+    context = {"album": res, "title": title, "author": author}
+    return render(request, 'platform_working/albums_lists.html', context=context)
 
 
 #  используется
@@ -216,8 +219,11 @@ def get_playlists_by_title(request, title):
 
 
 def get_playlist_with_playlist_list(request, playlist_id):
-    response = PlaylistList.objects.all().filter(id_playlist=playlist_id).values()
-    return HttpResponse(response)
+    response = PlaylistList.objects.all().filter(id_playlist=playlist_id)
+    title = Playlists.objects.get(id_playlist=playlist_id).playlist_title
+    author = Users.objects.get(id_user=Playlists.objects.get(id_playlist=playlist_id).id_user.id_user)
+    context = {"title": title, "author": author, "playlist": response}
+    return render(request, 'platform_working/playlists_lists.html', context=context)
 
 
 def create_playlist(request):

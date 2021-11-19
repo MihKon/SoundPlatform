@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
-    <title>Албьомы</title>
+    <title>Плейлист</title>
 </head>
 <body>
 <header>
@@ -28,7 +28,7 @@
                 <div class="navbar-nav">
                     <a class="nav-link" aria-current="page" href={% url "platform_working:all_users" %}>Пользователи</a>
                     <a class="nav-link" href={% url "platform_working:all_songs" %}>Песни</a>
-                    <a class="nav-link active" href={% url "platform_working:all_albums" %}>Альбомы</a>
+                    <a class="nav-link" href={% url "platform_working:all_albums" %}>Альбомы</a>
                     <a class="nav-link" href={% url "platform_working:all_playlists" %}>Плейлисты</a>
                     <a class="nav-link" href={% url "platform_working:all_groups" %}>Сообщества</a>
                 </div>
@@ -39,26 +39,51 @@
             </div>
         </div>
     </nav>
-</header>
-<div>
-    {% if lst %}
-        <ul class="list-unstyled">
-            {% for album in lst %}
-                <li>
-                    <div>
-                        <img src="https://e7.pngegg.com/pngimages/291/730/png-clipart-computer-icons-album-music-music-box-classic-album-photography.png"
-                             alt="album" width="100" height="100">
-                        <a href={% url 'platform_working:album_list' album.id_album%} class="link-dark">
-                            {{ album.album_title }}
-                        </a>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No albums are available.</p>
+    {% if title %}
+        <div style="background-color: oldlace">
+            <img src="https://cdn.pixabay.com/photo/2021/01/08/14/44/cd-5900095_1280.png"
+                 alt="album" width="100" height="100">
+            <h1>
+                {{ title }}
+            </h1>
+            {% if author %}
+                <p>
+                    Автор:
+                    <img src="https://pixelbox.ru/wp-content/uploads/2021/05/ava-vk-animal-91.jpg"
+                         alt="user" width="30" height="30">
+                    <a href={% url 'platform_working:profile' author.id_user %} class="link-dark">
+                        {{ author.login }}
+                    </a>
+                </p>
+            {% endif %}
+        </div>
     {% endif %}
-</div>
+</header>
+{% if playlist %}
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col">№</th>
+            <th scope="col">Название</th>
+            <th scope="col">Время</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for song in playlist %}
+            <tr>
+                <td>{{ song.number }}</td>
+                <td>
+                    <a href={% url 'platform_working:song' song.id_song %} class="link-dark">
+                        {{ song.song_title }}
+                    </a>
+                </td>
+                {% load tags_extras %}
+                <td>{{ song.time|time }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous">
 </script>
