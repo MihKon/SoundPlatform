@@ -142,7 +142,7 @@
                             {% if sub.id_group != null %}
                                 <img src="https://img.favpng.com/9/13/15/computer-icons-symbol-icon-design-png-favpng-dwyij4WSdArzhDxL0M9X6mejB.jpg"
                                      alt="group" width="80" height="80">
-                                <a href={% url "platform_working:all_users" %} class="link-dark">
+                                <a href={% url "platform_working:group_members" sub.id_group %} class="link-dark">
                                     {{ sub.id_user__groups__group_title }}
                                 </a>
                             {% else %}

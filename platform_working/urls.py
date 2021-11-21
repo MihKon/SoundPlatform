@@ -16,5 +16,5 @@ urlpatterns = [
     path('playlists/', views.get_all_playlists, name='all_playlists'),
     path('playlists/<int:playlist_id>/', views.get_playlist_with_playlist_list, name='playlist_list'),
     path('groups/', views.get_all_groups, name='all_groups'),
-    path('groups/members/', views.get_users_by_group_id, name='group_members'),
+    path('groups/<int:group_id>/members/', views.get_users_by_group_id, name='group_members'),
 ]

@@ -108,7 +108,7 @@
                     <div>
                         <img src="https://img.favpng.com/9/13/15/computer-icons-symbol-icon-design-png-favpng-dwyij4WSdArzhDxL0M9X6mejB.jpg"
                              alt="group" width="85" height="85">
-                        <a href={% url 'platform_working:all_users' %} class="link-dark">
+                        <a href={% url 'platform_working:group_members' group.id_group %} class="link-dark">
                             {{ group.group_title }}
                         </a>
                     </div>

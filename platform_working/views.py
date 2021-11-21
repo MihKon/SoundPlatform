@@ -273,9 +273,14 @@ def delete_group_by_id(request, group_id):
 
 def get_users_by_group_id(request, group_id):
     res = Subscriptions.objects.all(). \
-        values("id_follower__login", "id_follower_id", "id_follower__image", "id_group"). \
+        values("id_follower__login", "id_follower_id", "id_follower__image", "id_group", "id_follower",
+               "id_user__groups__group_title", "id_user__login", "id_user"). \
         filter(id_group=group_id)
-    return res
+    user_id = Groups.objects.get(id_group=group_id).id_user.id_user
+    user = Users.objects.get(id_user=user_id)
+    title = Groups.objects.get(id_group=group_id).group_title
+    context = {"group": res, "title": title, "user": user}
+    return render(request, 'platform_working/group_members.html', context=context)
 
 
 def get_reviews_of_user(request, user_id):
