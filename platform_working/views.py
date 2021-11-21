@@ -47,6 +47,11 @@ def profile(request, user_id):
                                                                              'id_song', 'id_review',
                                                                              'id_reviewer').get()
             lst.append(reviews)
+    reposts = Reposts.objects.filter(id_reposter=user_id).all().order_by('id_repost')
+    reposted_songs = []
+    for song in reposts:
+        reposted_songs.append(Songs.objects.filter(id_song=song.id_song).values('id_song', 'id_user', 'id_user__login',
+                                                                                'song_title').get())
     return render(request, 'platform_working/profile.html',
                   context={
                       "lst": response,
@@ -55,7 +60,9 @@ def profile(request, user_id):
                       "playlists": playlists,
                       "user": user,
                       "subs": subs,
-                      "reviews": lst
+                      "reviews": lst,
+                      "reposts": reposts,
+                      "reposted_songs": reposted_songs
                   })
 
 
@@ -160,6 +167,7 @@ def delete_song_by_id(request, song_id):
     Songs.objects.filter(id_song=song_id).delete()
 
 
+#  готово (и метод, и шаблон)
 def get_all_albums(request):
     response = Albums.objects.all()
     return render(request, 'platform_working/all_albums.html', context={"lst": response})
@@ -173,6 +181,7 @@ def get_albums_by_title(request, title):
     return res
 
 
+#  готово (и метод, и шаблон)
 def get_album_with_album_list(request, album_id):
     res = AlbumList.objects.all().filter(id_album=album_id).order_by('number')
     title = Albums.objects.get(id_album=album_id).album_title
@@ -204,6 +213,7 @@ def delete_album_by_id(request, album_id):
     Albums.objects.filter(id_album=album_id).delete()
 
 
+#  готово (и метод, и шаблон)
 def get_all_playlists(request):
     res = Playlists.objects.all()
     context = {"lst": res}
@@ -218,6 +228,7 @@ def get_playlists_by_title(request, title):
     return res
 
 
+#  готово (и метод, и шаблон)
 def get_playlist_with_playlist_list(request, playlist_id):
     response = PlaylistList.objects.all().filter(id_playlist=playlist_id).order_by('number')
     title = Playlists.objects.get(id_playlist=playlist_id).playlist_title
@@ -245,6 +256,7 @@ def delete_playlist_by_id(request, mix_id):
     Playlists.objects.filter(id_playlist=mix_id).delete()
 
 
+#  готово (и метод, и шаблон)
 def get_all_groups(request):
     res = Groups.objects.all()
     return render(request, 'platform_working/all_groups.html', context={"lst": res})
@@ -271,6 +283,7 @@ def delete_group_by_id(request, group_id):
     Groups.objects.filter(id_group=group_id).delete()
 
 
+#  готово (и метод, и шаблон)
 def get_users_by_group_id(request, group_id):
     res = Subscriptions.objects.all(). \
         values("id_follower__login", "id_follower_id", "id_follower__image", "id_group", "id_follower",
@@ -283,9 +296,9 @@ def get_users_by_group_id(request, group_id):
     return render(request, 'platform_working/group_members.html', context=context)
 
 
-def get_reviews_of_user(request, user_id):
-    res = Reviews.objects.all().filter(id_reviewer=user_id)
-    return res
+# def get_reviews_of_user(request, user_id):
+#     res = Reviews.objects.all().filter(id_reviewer=user_id)
+#     return res
 
 
 def create_review(request):
@@ -302,9 +315,9 @@ def delete_review(request, review_id):
     Reviews.objects.filter(id_review=review_id).delete()
 
 
-def get_subscriptions_of_user(request, user_id):
-    response = Subscriptions.objects.all().filter(id_follower=user_id)
-    return response
+# def get_subscriptions_of_user(request, user_id):
+#     response = Subscriptions.objects.all().filter(id_follower=user_id)
+#     return response
 
 
 def create_sub(request):
