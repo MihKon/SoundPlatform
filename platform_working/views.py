@@ -1,6 +1,8 @@
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, redirect
 from django.db.models import Q
+from django.urls import reverse
+from .forms import *
 from .models import Songs
 from .models import Users
 from .models import Albums
@@ -21,7 +23,7 @@ def index(request):
     то есть - при попадании на эту страницу, пользователю будет предложено пройти авторизацию
     если же он уже авторизирован, будет осуществлен переход на глвную страницу
     """
-    return HttpResponse("Hello, world. You're at the polls index.")
+    return render(request, 'platform_working/index.html')
 
 
 #  готово (и метод, и шаблон)
@@ -105,14 +107,26 @@ def get_user_by_login(request, login):
     return res
 
 
+# готово (и метод, и шаблон)
 def create_user(request):
-    email = request.POST['email']
-    login = request.POST['login']
-    password = request.POST['password']
-    age = request.POST['age']
-    image = request.POST['file']  # нужно будет исправить
-    u = Users(email=email, login=login, password=password, age=age, image=image)
-    u.save()
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            form.save()
+            u = Users.objects.get(login=form.cleaned_data['login'])
+            return HttpResponseRedirect(reverse('platform_working:profile', args=(u.id_user,)))
+    else:
+        form = RegisterForm()
+    context = {'form': form}
+    return render(request, 'platform_working/new_user.html', context=context)
+
+
+def update_user(request):
+    return 1
+
+
+def delete_user(request):
+    return 2
 
 
 #  готово (и метод, и шаблон)
@@ -163,6 +177,10 @@ def create_song(request):
     song.save()
 
 
+def update_song(request, song_id):
+    return 1
+
+
 def delete_song_by_id(request, song_id):
     Songs.objects.filter(id_song=song_id).delete()
 
@@ -209,6 +227,18 @@ def create_album(request):
     album.save()
 
 
+def create_album_list(request, album_id):
+    return 0
+
+
+def update_album(request, album_id):
+    return 1
+
+
+def update_album_list(request, album_id, song_id):
+    return 1
+
+
 def delete_album_by_id(request, album_id):
     Albums.objects.filter(id_album=album_id).delete()
 
@@ -252,6 +282,18 @@ def create_playlist(request):
     mix.save()
 
 
+def create_playlist_list(request, playlist_id):
+    return 0
+
+
+def update_playlist(request, playlist_id):
+    return 1
+
+
+def update_playlist_list(request, playlist_id, song_id):
+    return 1
+
+
 def delete_playlist_by_id(request, mix_id):
     Playlists.objects.filter(id_playlist=mix_id).delete()
 
@@ -277,6 +319,10 @@ def create_group(request):
     user = request.user.id
     group = Groups(creator=creator, group_title=title, description=des, id_user=user)
     group.save()
+
+
+def update_group(request, group_id):
+    return 1
 
 
 def delete_group_by_id(request, group_id):
@@ -332,9 +378,9 @@ def delete_sub(request, sub_id):
     Subscriptions.objects.filter(id_subscription=sub_id).delete()
 
 
-def get_reposts_of_user(request, user_id):
-    r = Reposts.objects.all().filter(id_reposter=user_id)
-    return r
+# def get_reposts_of_user(request, user_id):
+#     r = Reposts.objects.all().filter(id_reposter=user_id)
+#     return r
 
 
 def create_repost(request):
