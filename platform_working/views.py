@@ -19,7 +19,7 @@ id_const_user = 1
 
 
 # Create your views here.
-
+# есть
 def index(request):
     """
     будем использовать это, как приветственную страницу
@@ -185,8 +185,38 @@ def update_user(request):
     return render(request, 'platform_working/update_user.html', context={'form': form})
 
 
+#  готово (но может и нет, надо пробовать)
 def delete_user(request):
     global id_const_user
+    users_to_delete = Subscriptions.objects.filter(id_user=id_const_user)
+    for user in users_to_delete:
+        user.delete()
+    users_to_delete = Groups.objects.filter(id_user=id_const_user)
+    for user in users_to_delete:
+        user.delete()
+    users_to_delete = Reposts.objects.filter(id_user=id_const_user)
+    for user in users_to_delete:
+        user.delete()
+    users_to_delete = Reviews.objects.filter(id_user=id_const_user)
+    for user in users_to_delete:
+        user.delete()
+    users_to_delete = Albums.objects.filter(id_user=id_const_user)
+    id_al = Albums.objects.filter(id_user=id_const_user)
+    for i in id_al:
+        lst = AlbumList.objects.filter(id_album=i.id_album)
+        for j in lst:
+            j.delete()
+        i.delete()
+    users_to_delete = Playlists.objects.filter(id_user=id_const_user)
+    id_al = Playlists.objects.filter(id_user=id_const_user)
+    for i in id_al:
+        lst = PlaylistList.objects.filter(id_album=i.id_playlist)
+        for j in lst:
+            j.delete()
+        i.delete()
+    users_to_delete = Songs.objects.filter(id_user=id_const_user)
+    for song in users_to_delete:
+        song.delete()
     Users.objects.get(id_user=id_const_user).delete()
     return render(request, 'platform_working/index.html')
 
@@ -266,9 +296,25 @@ def update_song(request, song_id):
     return render(request, 'platform_working/update_song.html', context={'form': form})
 
 
-#  готово, но стоит поработать над тем, чтобы удалять песни и из других таблиц (или написать триггер)
+#  готово (возможно)
 def delete_song_by_id(request, song_id):
     user_id = Songs.objects.get(id_song=song_id).id_user
+    songs_to_delete = AlbumList.objects.filter(id_song=song_id)
+    if songs_to_delete is not None:
+        for song in songs_to_delete:
+            song.delete()
+    songs_to_delete = PlaylistList.objects.filter(id_song=song_id)
+    if songs_to_delete is not None:
+        for song in songs_to_delete:
+            song.delete()
+    songs_to_delete = Reviews.objects.filter(id_song=song_id)
+    if songs_to_delete is not None:
+        for song in songs_to_delete:
+            song.delete()
+    songs_to_delete = Reposts.objects.filter(id_song=song_id)
+    if songs_to_delete is not None:
+        for song in songs_to_delete:
+            song.delete()
     Songs.objects.get(id_song=song_id).delete()
     return HttpResponseRedirect(reverse('platform_working:profile', args=(user_id.id_user,)))
 
@@ -317,16 +363,35 @@ def create_album(request):
             album = Albums(**form.cleaned_data)
             album.save()
             # print(form.cleaned_data)
-            #  return HttpResponseRedirect(reverse('platform_working:create_album_list', args=(album.id_album,)))
+            return HttpResponseRedirect(reverse('platform_working:profile', args=(id_const_user,)))
     else:
         form = AddAlbumForm()
     return render(request, 'platform_working/new_album.html', context={'form': form})
 
 
 def create_album_list(request, album_id):
+    global id_const_user
+    songs = Songs.objects.all().filter(id_user=id_const_user)
+    context = {'songs': songs, 'al_id': album_id}
     if request.method == 'POST':
-        form = 0
-    return 0
+        lst = request.POST.getlist('songs')
+        numbers = []
+        for song in lst:
+            title = Songs.objects.get(id_song=int(song)).song_title
+            time = Songs.objects.get(id_song=int(song)).time
+            number = int(request.POST['number'])
+            for n in numbers:
+                if n == number:
+                    number = max(numbers) + 1
+            if number < 0:
+                number = max(numbers) + 1
+            numbers.append(number)
+            album = Albums.objects.get(id_album=album_id)
+            new_album_list = AlbumList(id_album=album, id_song=int(song), number=int(number), time=time, song_title=title)
+            new_album_list.save()
+
+        return HttpResponseRedirect(reverse('platform_working:album_list', args=(album_id,)))
+    return render(request, 'platform_working/new_album_list.html', context=context)
 
 
 def update_album(request, album_id):
@@ -337,6 +402,7 @@ def update_album_list(request, album_id, song_id):
     return 1
 
 
+#  готово
 def delete_album_by_id(request, album_id):
     Albums.objects.filter(id_album=album_id).delete()
     return render(request, 'platform_working/all_albums.html')
@@ -456,11 +522,6 @@ def get_users_by_group_id(request, group_id):
     return render(request, 'platform_working/group_members.html', context=context)
 
 
-# def get_reviews_of_user(request, user_id):
-#     res = Reviews.objects.all().filter(id_reviewer=user_id)
-#     return res
-
-
 def create_review(request):
     text = request.POST['text']
     date = request.POST['date']
@@ -475,11 +536,6 @@ def delete_review(request, review_id):
     Reviews.objects.filter(id_review=review_id).delete()
 
 
-# def get_subscriptions_of_user(request, user_id):
-#     response = Subscriptions.objects.all().filter(id_follower=user_id)
-#     return response
-
-
 def create_sub(request):
     follower = request.user.id
     group = request.POST['group']
@@ -490,11 +546,6 @@ def create_sub(request):
 
 def delete_sub(request, sub_id):
     Subscriptions.objects.filter(id_subscription=sub_id).delete()
-
-
-# def get_reposts_of_user(request, user_id):
-#     r = Reposts.objects.all().filter(id_reposter=user_id)
-#     return r
 
 
 def create_repost(request):

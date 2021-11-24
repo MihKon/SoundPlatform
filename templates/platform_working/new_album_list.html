@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <title>Добавление альбома</title>
+</head>
+<body>
+<header>
+    <div style="background-color: cornflowerblue">
+        <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/418f0a68688713.5b65b8eda5782.png"
+             class="rounded mx-auto d-block" width="300" height="200">
+    </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="https://static-s.aa-cdn.net/img/gp/20600005690568/msPaM0DBaJ16mp8SbexZaO10WD18zek3PoYZ_NzOfp0q50wYQiY4R8DZZqRXQ9N5bnY4=w300?v=1"
+                     alt="" width="30" height="30">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                    <a class="nav-link" aria-current="page" href={% url "platform_working:all_users" %}>Пользователи</a>
+                    <a class="nav-link" href={% url "platform_working:all_songs" %}>Песни</a>
+                    <a class="nav-link" href={% url "platform_working:all_albums" %}>Альбомы</a>
+                    <a class="nav-link" href={% url "platform_working:all_playlists" %}>Плейлисты</a>
+                    <a class="nav-link" href={% url "platform_working:all_groups" %}>Сообщества</a>
+                </div>
+                <form class="d-flex" action="{% url "platform_working:user_search" %}" method="get">
+                    <input class="form-control me-2" name="q" type="text" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+</header>
+<form action="{% url 'platform_working:create_album_list' al_id %}" method="post">
+    {% csrf_token %}
+    {#    {{ form.as_p }}#}
+    {% if songs %}
+        {% if error %}
+            {{ error }}
+        {% endif %}
+        {% for song in songs %}
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="songs"
+                       value={{ song.id_song }} id={{ song.id_song }}>
+                <label class="form-check-label" for={{ song.id_song }}>
+                    <img src="https://tattoo-stickers.ru/34209-thickbox_default/skripichnyy-kluch.jpg"
+                         alt="user" width="50" height="50">
+                    {{ song.song_title }}
+                </label>
+                <label for="number"></label>
+                <input type="number" id="number" name="number">
+            </div>
+        {% endfor %}
+    {% endif %}
+    <button type="submit" class="btn btn-primary">Добавить</button>
+</form>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous">
+</script>
+</body>
+</html>

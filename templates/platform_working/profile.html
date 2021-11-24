@@ -33,6 +33,11 @@
                     <a class="nav-link" href={% url "platform_working:all_groups" %}>Сообщества</a>
                 </div>
             </div>
+            {% if id_const %}
+                <div class="navbar-nav" align="left">
+                    <a class="nav-link" aria-current="page" href={% url "platform_working:index" %}>Выйти</a>
+                </div>
+            {% endif %}
         </div>
     </nav>
     {% if user %}

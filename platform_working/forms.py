@@ -71,7 +71,6 @@ class UpdateUserForm(forms.ModelForm):
 
 
 class AddSongForm(forms.ModelForm):
-
     class Meta:
         model = Songs
         fields = '__all__'
@@ -97,7 +96,6 @@ class UpdateSongForm(forms.ModelForm):
 
 
 class AddAlbumForm(forms.ModelForm):
-
     class Meta:
         model = Albums
         fields = ['album_title', 'genre', 'date', 'description', 'number_of_songs']

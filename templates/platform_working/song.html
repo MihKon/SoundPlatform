@@ -57,7 +57,10 @@
         </div>
     {% endif %}
 </header>
-<h1>player</h1>
+<audio controls="controls" loop="loop" preload="auto" src="C:\Users\owner\Downloads\Первый опыт.mp3">
+    <source src="C:\Users\owner\Downloads\Первый опыт.mp3" type="audio/mpeg"/>
+    Your browser does not support the audio element.
+</audio>
 {% if song %}
     {% if id_const %}
         <a href="{% url 'platform_working:delete_song' song.id_song %}">
