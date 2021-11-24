@@ -61,7 +61,7 @@
 {% if song %}
     {% if id_const %}
         <a href="{% url 'platform_working:delete_song' song.id_song %}">
-            <button type="button" class="btn btn-danger" onclick="alert('Вы удалили объявление')">Удалить</button>
+            <button type="button" class="btn btn-danger" onclick="alert('Вы удалили песню')">Удалить</button>
         </a>
         <a href="{% url 'platform_working:update_song' song.id_song %}">
             <button type="button" class="btn btn-info">Изменить</button>

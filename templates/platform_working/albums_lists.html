@@ -55,6 +55,11 @@
         </div>
     {% endif %}
 </header>
+{% if id_const %}
+    <a href="{% url 'platform_working:delete_album' id_al %}">
+        <button type="button" class="btn btn-danger" onclick="alert('Вы удалили альбом')">Удалить</button>
+    </a>
+{% endif %}
 {% if album %}
     <table class="table table-hover">
         <thead>

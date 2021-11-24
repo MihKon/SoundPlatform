@@ -100,5 +100,11 @@ class AddAlbumForm(forms.ModelForm):
 
     class Meta:
         model = Albums
-        fields = '__all__'
-
+        fields = ['album_title', 'genre', 'date', 'description', 'number_of_songs']
+        widgets = {
+            'album_title': forms.TextInput(attrs={'class': 'form-control'}),
+            'number_of_songs': forms.NumberInput(attrs={'class': 'form-control'}),
+            'genre': forms.TextInput(attrs={'class': 'form-control'}),
+            'date': forms.DateInput(attrs={'type': 'date'}),
+            'description': forms.Textarea(attrs={'class': 'form-control'})
+        }

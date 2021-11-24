@@ -13,6 +13,7 @@ from .models import PlaylistList
 from .models import Reposts
 from .models import Reviews
 from .models import Subscriptions
+from datetime import datetime
 
 id_const_user = 1
 
@@ -294,7 +295,7 @@ def get_album_with_album_list(request, album_id):
     author = Users.objects.get(id_user=Albums.objects.get(id_album=album_id).id_user.id_user)
     global id_const_user
     if author.id_user == id_const_user:
-        context = {"album": res, "title": title, "author": author, "id_const": id_const_user}
+        context = {"album": res, "title": title, "author": author, "id_const": id_const_user, "id_al": album_id}
     else:
         context = {"album": res, "title": title, "author": author}
     return render(request, 'platform_working/albums_lists.html', context=context)
@@ -312,8 +313,10 @@ def create_album(request):
         form = AddAlbumForm(request.POST)
         if form.is_valid():
             form.cleaned_data['id_user'] = Users.objects.get(id_user=id_const_user)
+            form.cleaned_data['date'] = datetime.now().date()
             album = Albums(**form.cleaned_data)
-            print(album.objects)
+            album.save()
+            # print(form.cleaned_data)
             #  return HttpResponseRedirect(reverse('platform_working:create_album_list', args=(album.id_album,)))
     else:
         form = AddAlbumForm()
