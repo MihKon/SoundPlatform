@@ -46,6 +46,16 @@
             </p>
         </div>
     {% endif %}
+    {% if sub %}
+        <a href="{% url 'platform_working:create_sub_on_user' user.id_user %}">
+            <button type="button" class="btn btn-success">Подписаться</button>
+        </a>
+    {% endif %}
+    {% if id_const %}
+        <a href="{% url 'platform_working:update_user' %}">
+            <button type="button" class="btn btn-info">Изменить</button>
+        </a>
+    {% endif %}
 </header>
 <ul class="nav nav-tabs" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
@@ -81,6 +91,9 @@
 </ul>
 <div class="tab-content" id="userProfile">
     <div class="tab-pane fade show active" id="songs" role="tabpanel" aria-labelledby="songs-tab">
+        {% if id_const %}
+            <a class="btn btn-success" href={% url 'platform_working:create_song' %} role="button">+ Добавить песню</a>
+        {% endif %}
         {% if songs %}
             <ul class="list-unstyled">
                 {% for song in songs %}
@@ -101,6 +114,10 @@
         {% endif %}
     </div>
     <div class="tab-pane fade" id="albums" role="tabpanel" aria-labelledby="albums-tab">
+        {% if id_const %}
+            <a class="btn btn-success" href={% url 'platform_working:create_album' %} role="button">+ Добавить
+                альбом</a>
+        {% endif %}
         {% if albums %}
             <ul class="list-inline">
                 {% for album in albums %}
@@ -120,6 +137,10 @@
         {% endif %}
     </div>
     <div class="tab-pane fade" id="playlists" role="tabpanel" aria-labelledby="playlists-tab">
+        {% if id_const %}
+            <a class="btn btn-success" href={% url 'platform_working:create_playlist' %} role="button">+ Создать
+                плейлист</a>
+        {% endif %}
         {% if playlists %}
             <ul class="list-inline">
                 {% for playlist in playlists %}
@@ -166,6 +187,11 @@
         {% endif %}
     </div>
     <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+        {% if not id_const %}
+            <a class="btn btn-success"
+               href={% url 'platform_working:create_review_on_user' user.id_user %} role="button">Написать
+                отзыв</a>
+        {% endif %}
         {% if reviews %}
             <ul class="list-unstyled">
                 {% for review in reviews %}

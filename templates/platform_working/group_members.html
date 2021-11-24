@@ -58,8 +58,13 @@
     {% endif %}
 </header>
 {% if group %}
+    {% if id_const %}
+        <a href="{% url 'platform_working:create_sub_on_group' id_g %}">
+            <button type="button" class="btn btn-success">Подписаться</button>
+        </a>
+    {% endif %}
     <ul class="list-unstyled">
-    <h4>Подписчики: </h4>
+        <h4>Подписчики: </h4>
         {% for follower in group %}
             <li>
                 <div>
@@ -74,6 +79,11 @@
     </ul>
 {% else %}
     <h3>В это сообщество ещё никто не вступил. Будьте первыми!</h3>
+    {% if id_const %}
+        <a href="{% url 'platform_working:create_sub_on_group' id_g %}">
+            <button type="button" class="btn btn-success">Подписаться</button>
+        </a>
+    {% endif %}
 {% endif %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous">

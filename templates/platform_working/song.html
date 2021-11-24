@@ -59,6 +59,14 @@
 </header>
 <h1>player</h1>
 {% if song %}
+    {% if id_const %}
+        <a href="{% url 'platform_working:delete_song' song.id_song %}">
+            <button type="button" class="btn btn-danger" onclick="alert('Вы удалили объявление')">Удалить</button>
+        </a>
+        <a href="{% url 'platform_working:update_song' song.id_song %}">
+            <button type="button" class="btn btn-info">Изменить</button>
+        </a>
+    {% endif %}
     <dl class="row">
         <dt class="col-sm-3">Время</dt>
         <dd class="col-sm-9">{{ time }}</dd>
