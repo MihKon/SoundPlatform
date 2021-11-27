@@ -56,6 +56,11 @@
             <button type="button" class="btn btn-success">Подписаться</button>
         </a>
     {% endif %}
+    {% if del_sub %}
+        <a href="{% url 'platform_working:delete_sub_on_user' user.id_user %}">
+            <button type="button" class="btn btn-danger">Отписаться</button>
+        </a>
+    {% endif %}
     {% if id_const %}
         <a href="{% url 'platform_working:update_user' %}">
             <button type="button" class="btn btn-info">Изменить</button>
@@ -213,6 +218,11 @@
                                 </figcaption>
                             </figure>
                         </div>
+                        {% if review.id_reviewer.id_user == id_const %}
+                            <a href="{% url 'platform_working:delete_review_on_user' user.id_user %}">
+                                <button type="button" class="btn btn-danger">Удалить</button>
+                            </a>
+                        {% endif %}
                     </li>
                     <li></li>
                 {% endfor %}
@@ -243,6 +253,9 @@
                                             <a href={% url 'platform_working:song' song.id_song %} class="link-dark">
                                                 {{ song.song_title }}
                                             </a>
+                                            <a href="{% url 'platform_working:delete_repost' song.id_song %}">
+                                                <button type="button" class="btn btn-danger">Удалить репост</button>
+                                            </a>
                                         </figcaption>
                                     </figure>
                                 {% endif %}
@@ -252,7 +265,7 @@
                 {% endfor %}
             </ul>
         {% else %}
-            <p>Пользоавтель не добавил ни одной песни</p>
+            <p>Пользователь не добавил ни одной песни</p>
         {% endif %}
     </div>
 </div>

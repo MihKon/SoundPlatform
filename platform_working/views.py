@@ -96,7 +96,8 @@ def profile(request, user_id):
                        "sub": 1}
         else:
             context = {"lst": response, "songs": songs, "albums": albums, "playlists": playlists,
-                       "user": user, "subs": subs, "reviews": lst, "reposts": reposts, "reposted_songs": reposted_songs}
+                       "user": user, "subs": subs, "reviews": lst, "reposts": reposts, "reposted_songs": reposted_songs,
+                       "del_sub": 1}
     return render(request, 'platform_working/profile.html', context=context)
 
 
@@ -248,7 +249,7 @@ def get_songs_by_user_id(request, user_id):
 #  готово (и метод, и шаблон)
 def get_song_by_id(request, song_id):
     response = Songs.objects.filter(id_song=song_id).get()
-    rev = Reviews.objects.all().filter(id_song=song_id).values('id_reviewer__login', 'text', 'date', 'id_reviewer')
+    rev = Reviews.objects.all().filter(id_song=song_id).values('id_reviewer__login', 'text', 'date', 'id_reviewer', 'id_reviewer_id')
     title = Songs.objects.get(id_song=song_id)
     user = Users.objects.filter(id_user=title.id_user.id_user).get()
     albums = AlbumList.objects.filter(id_song=song_id).values('id_album__album_title', 'id_album')
@@ -259,8 +260,14 @@ def get_song_by_id(request, song_id):
         context = {'song': response, 'reviews': rev, 'title': title, 'albums': albums,
                    'playlists': mixes, 'author': user, 'time': time, 'id_const': id_const_user}
     else:
-        context = {'song': response, 'reviews': rev, 'title': title, 'albums': albums,
-                   'playlists': mixes, 'author': user, 'time': time}
+        rep = Reposts.objects.filter(id_reposter=id_const_user, id_song=song_id)
+        print(rep)
+        if rep.count() == 0:
+            context = {'song': response, 'reviews': rev, 'title': title, 'albums': albums,
+                       'playlists': mixes, 'author': user, 'time': time, "rep": 1}
+        else:
+            context = {'song': response, 'reviews': rev, 'title': title, 'albums': albums,
+                       'playlists': mixes, 'author': user, 'time': time}
     return render(request, 'platform_working/song.html', context)
 
 
@@ -353,6 +360,7 @@ def get_album_by_user_id(request, user_id):
     return res
 
 
+#  готово
 def create_album(request):
     if request.method == 'POST':
         global id_const_user
@@ -369,6 +377,7 @@ def create_album(request):
     return render(request, 'platform_working/new_album.html', context={'form': form})
 
 
+#  готово
 def create_album_list(request, album_id):
     global id_const_user
     songs = Songs.objects.all().filter(id_user=id_const_user)
@@ -387,7 +396,8 @@ def create_album_list(request, album_id):
                 number = max(numbers) + 1
             numbers.append(number)
             album = Albums.objects.get(id_album=album_id)
-            new_album_list = AlbumList(id_album=album, id_song=int(song), number=int(number), time=time, song_title=title)
+            new_album_list = AlbumList(id_album=album, id_song=int(song), number=int(number), time=time,
+                                       song_title=title)
             new_album_list.save()
 
         return HttpResponseRedirect(reverse('platform_working:album_list', args=(album_id,)))
@@ -395,15 +405,27 @@ def create_album_list(request, album_id):
 
 
 def update_album(request, album_id):
-    return 1
+    album = Albums.objects.get(id_album=album_id)
+    form = UpdateAlbumForm(request.POST or None, instance=album)
+    if form.is_valid():
+        try:
+            form.save()
+            return HttpResponseRedirect(reverse('platform_working:album_list', args=(album_id,)))
+        except:
+            form.add_error(None, 'Ошбика обновления альбома')
+
+    return render(request, 'platform_working/update_album.html', context={'form': form})
 
 
-def update_album_list(request, album_id, song_id):
-    return 1
+# def update_album_list(request, album_id, on_delete, song_id):
+#     if on_delete:
+#         AlbumList.objects.get(id_album=album_id, id_song=song_id).delete()
+#         return HttpResponseRedirect(reverse('platform_working:album_list', args=(album_id,)))
 
 
 #  готово
 def delete_album_by_id(request, album_id):
+    AlbumList.objects.all().filter(id_album=album_id).delete()
     Albums.objects.filter(id_album=album_id).delete()
     return render(request, 'platform_working/all_albums.html')
 
@@ -438,34 +460,81 @@ def get_playlist_with_playlist_list(request, playlist_id):
             lst.append(user)
     global id_const_user
     if author.id_user == id_const_user:
-        context = {"title": title, "author": author, "playlist": response, "users": lst, "id_const": id_const_user}
+        context = {"title": title, "author": author, "playlist": response, "users": lst, "id_const": id_const_user,
+                   "pl_id": playlist_id}
     else:
         context = {"title": title, "author": author, "playlist": response, "users": lst}
     return render(request, 'platform_working/playlists_lists.html', context=context)
 
 
+# yes
 def create_playlist(request):
-    title = request.POST['title']
-    time = request.POST['time']
-    user = request.user.id
-    mix = Playlists(playlist_title=title, time=time, id_user=user)
-    mix.save()
+    if request.method == 'POST':
+        global id_const_user
+        form = AddPlaylistForm(request.POST)
+        if form.is_valid():
+            form.cleaned_data['id_user'] = Users.objects.get(id_user=id_const_user)
+            playlist = Playlists(**form.cleaned_data)
+            playlist.save()
+            # print(form.cleaned_data)
+            return HttpResponseRedirect(reverse('platform_working:profile', args=(id_const_user,)))
+    else:
+        form = AddPlaylistForm()
+    return render(request, 'platform_working/new_playlist.html', context={'form': form})
 
 
+# yes
 def create_playlist_list(request, playlist_id):
-    return 0
+    global id_const_user
+    songs = Songs.objects.all()
+    context = {'songs': songs, 'pl_id': playlist_id}
+    if request.method == 'POST':
+        lst = request.POST.getlist('songs')
+        numbers = []
+        for song in lst:
+            title = Songs.objects.get(id_song=int(song)).song_title
+            time = Songs.objects.get(id_song=int(song)).time
+            author_id = Songs.objects.get(id_song=int(song)).id_user.id_user
+            number = int(request.POST['number'])
+            for n in numbers:
+                if n == number:
+                    number = max(numbers) + 1
+            if number < 0:
+                number = max(numbers) + 1
+            numbers.append(number)
+            playlist = Playlists.objects.get(id_playlist=playlist_id)
+            new_playlist_list = PlaylistList(id_playlist=playlist, id_song=int(song), id_author=author_id,
+                                             time=time, number=number, song_title=title)
+            new_playlist_list.save()
+
+        return HttpResponseRedirect(reverse('platform_working:playlist_list', args=(playlist_id,)))
+    return render(request, 'platform_working/new_playlist_list.html', context=context)
 
 
+# yes
 def update_playlist(request, playlist_id):
-    return 1
+    playlist = Playlists.objects.get(id_playlist=playlist_id)
+    form = UpdatePlaylistForm(request.POST or None, instance=playlist)
+    if form.is_valid():
+        try:
+            form.save()
+            return HttpResponseRedirect(reverse('platform_working:playlist_list', args=(playlist_id,)))
+        except:
+            form.add_error(None, 'Ошбика обновления плейлиста')
+
+    return render(request, 'platform_working/update_playlist.html', context={'form': form})
 
 
-def update_playlist_list(request, playlist_id, song_id):
-    return 1
+# def update_playlist_list(request, playlist_id, song_id):
+#     return 1
 
 
-def delete_playlist_by_id(request, mix_id):
-    Playlists.objects.filter(id_playlist=mix_id).delete()
+#  yes
+# yes
+def delete_playlist_by_id(request, playlist_id):
+    PlaylistList.objects.all().filter(id_playlist=playlist_id).delete()
+    Playlists.objects.filter(id_playlist=playlist_id).delete()
+    return render(request, 'platform_working/all_playlists.html')
 
 
 #  готово (и метод, и шаблон)
@@ -483,17 +552,35 @@ def get_groups_by_title(request, title):
     return res
 
 
+#  yes
 def create_group(request):
-    creator = Users.objects.filter(id_user=request.user.id).values('login')
-    title = request.POST['title']
-    des = request.POST['description']
-    user = request.user.id
-    group = Groups(creator=creator, group_title=title, description=des, id_user=user)
-    group.save()
+    if request.method == 'POST':
+        global id_const_user
+        form = AddGroupForm(request.POST)
+        if form.is_valid():
+            creator = Users.objects.get(id_user=id_const_user).login
+            user = Users.objects.get(id_user=id_const_user)
+            group = Groups(creator=creator, group_title=form.cleaned_data['group_title'],
+                           description=form.cleaned_data['description'], id_user=user)
+            group.save()
+            return HttpResponseRedirect(reverse('platform_working:group_members', args=(group.id_group,)))
+    else:
+        form = AddGroupForm()
+    return render(request, 'platform_working/new_group.html', context={'form': form})
 
 
+# yes
 def update_group(request, group_id):
-    return 1
+    group = Groups.objects.get(id_group=group_id)
+    form = UpdateAlbumForm(request.POST or None, instance=group)
+    if form.is_valid():
+        try:
+            form.save()
+            return HttpResponseRedirect(reverse('platform_working:group_members', args=(group_id,)))
+        except:
+            form.add_error(None, 'Ошбика обновления сообщества')
+
+    return render(request, 'platform_working/update_album.html', context={'form': form})
 
 
 def delete_group_by_id(request, group_id):
@@ -518,44 +605,105 @@ def get_users_by_group_id(request, group_id):
     if not flag:
         context = {"group": res, "title": title, "user": user, "id_g": group_id, "id_const": id_const_user}
     else:
-        context = {"group": res, "title": title, "user": user}
+        if user_id != id_const_user:
+            context = {"group": res, "title": title, "user": user, "id_g": 1}
+        else:
+            context = {"group": res, "title": title, "user": user}
+
     return render(request, 'platform_working/group_members.html', context=context)
 
 
-def create_review(request):
-    text = request.POST['text']
-    date = request.POST['date']
-    reviewer = request.user.id
-    song = request.POST['song']
-    user = request.POST['user']
-    rev = Reviews(text=text, date=date, id_reviewer=reviewer, id_song=song, id_user=user)
-    rev.save()
+# yes
+def create_review_on_user(request, user_id):
+    if request.method == 'POST':
+        global id_const_user
+        form = AddReviewForm(request.POST)
+        if form.is_valid():
+            date = datetime.now().date()
+            reviewer = Users.objects.get(id_user=id_const_user)
+            user = Users.objects.get(id_user=user_id)
+            review = Reviews(text=form.cleaned_data['text'], date=date, id_reviewer=reviewer,
+                             id_user=user, id_song=None)
+            review.save()
+            return HttpResponseRedirect(reverse('platform_working:profile', args=(user_id,)))
+    else:
+        form = AddReviewForm()
+    return render(request, 'platform_working/new_review.html', context={'form': form, 'user': user_id})
 
 
-def delete_review(request, review_id):
-    Reviews.objects.filter(id_review=review_id).delete()
+# yes
+def create_review_on_song(request, song_id):
+    if request.method == 'POST':
+        global id_const_user
+        form = AddReviewForm(request.POST)
+        if form.is_valid():
+            date = datetime.now().date()
+            reviewer = Users.objects.get(id_user=id_const_user)
+            user = Songs.objects.get(id_song=song_id).id_user
+            user_id = Users.objects.get(id_user=user.id_user)
+            review = Reviews(text=form.cleaned_data['text'], date=date, id_reviewer=reviewer,
+                             id_user=user_id, id_song=song_id)
+            review.save()
+            return HttpResponseRedirect(reverse('platform_working:song', args=(song_id,)))
+    else:
+        form = AddReviewForm()
+    return render(request, 'platform_working/new_review_on_song.html', context={'form': form, 'song': song_id})
 
 
-def create_sub(request):
-    follower = request.user.id
-    group = request.POST['group']
-    user = request.POST['user']
-    sub = Subscriptions(id_follower=follower, id_group=group, id_user=user)
+# yes
+def delete_review_on_user(request, user_id):
+    global id_const_user
+    Reviews.objects.filter(id_reviewer=id_const_user, id_user=user_id, id_song=None).delete()
+    return HttpResponseRedirect(reverse('platform_working:profile', args=(user_id,)))
+
+
+# yes
+def delete_review_on_song(request, song_id):
+    global id_const_user
+    Reviews.objects.filter(id_reviewer=id_const_user, id_song=song_id).delete()
+    return HttpResponseRedirect(reverse('platform_working:song', args=(song_id,)))
+
+
+# yes
+def create_sub(request, user_id, group_id):
+    global id_const_user
+    follower = Users.objects.get(id_user=id_const_user)
+    user = Users.objects.get(id_user=user_id)
+    sub = Subscriptions(id_follower=follower, id_group=group_id, id_user=user)
     sub.save()
 
 
-def delete_sub(request, sub_id):
-    Subscriptions.objects.filter(id_subscription=sub_id).delete()
+# yes
+def delete_sub_on_user(request, user_id):
+    global id_const_user
+    Subscriptions.objects.filter(id_user=user_id, id_group=None, id_follower=id_const_user).delete()
 
 
-def create_repost(request):
-    text = request.POST['text']
-    song = request.POST['song']
-    reposter = request.user.id
-    user = request.POST['user']
-    repost = Reposts(text=text, id_song=song, id_reposter=reposter, id_user=user)
-    repost.save()
+# yes
+def delete_sub_on_group(request, group_id):
+    global id_const_user
+    Subscriptions.objects.filter(id_group=group_id, id_follower=id_const_user).delete()
 
 
-def delete_repost(request, rep_id):
-    Reposts.objects.filter(id_repost=rep_id).delete()
+# yes
+def create_repost(request, song_id):
+    if request.method == 'POST':
+        global id_const_user
+        form = AddRepostForm(request.POST)
+        if form.is_valid():
+            reposter = Users.objects.get(id_user=id_const_user)
+            user_id = Songs.objects.get(id_song=song_id)
+            user = Users.objects.get(id_user=user_id.id_user.id_user)
+            repost = Reposts(text=form.cleaned_data['text'], id_song=song_id, id_reposter=reposter, id_user=user)
+            repost.save()
+            return HttpResponseRedirect(reverse('platform_working:song', args=(song_id,)))
+    else:
+        form = AddRepostForm()
+    return render(request, 'platform_working/new_repost.html', context={'form': form, 'song': song_id})
+
+
+# yes
+def delete_repost(request, song_id):
+    global id_const_user
+    Reposts.objects.filter(id_song=song_id, id_reposter=id_const_user).delete()
+    return HttpResponseRedirect(reverse('platform_working:profile', args=(id_const_user,)))

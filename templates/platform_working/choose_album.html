@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <title>Албьомы</title>
+</head>
+<body>
+<header>
+    <div style="background-color: cornflowerblue">
+        <img src="https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/418f0a68688713.5b65b8eda5782.png"
+             class="rounded mx-auto d-block" width="300" height="200">
+    </div>
+</header>
+<div>
+    {% if lst %}
+        <ul class="list-unstyled">
+            {% for album in lst %}
+                <li>
+                    <form action="{% url 'platform_working:update_album_list' album.id_album 0 s_id %}" method="post">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio"
+                                   name={{ album.id_album }} id={{ album.id_album }}>
+                            <label class="form-check-label" for={{ album.id_album }}>
+                                <img src="https://e7.pngegg.com/pngimages/291/730/png-clipart-computer-icons-album-music-music-box-classic-album-photography.png"
+                                     alt="album" width="100" height="100">
+                                {{ album.album_title }}
+                            </label>
+                        </div>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No albums are available.</p>
+    {% endif %}
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous">
+</script>
+</body>
+</html>

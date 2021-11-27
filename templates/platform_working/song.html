@@ -70,6 +70,11 @@
             <button type="button" class="btn btn-info">Изменить</button>
         </a>
     {% endif %}
+    {% if rep %}
+        <a href="{% url 'platform_working:create_repost' song.id_song %}">
+            <button type="button" class="btn btn-success">Поделиться</button>
+        </a>
+    {% endif %}
     <dl class="row">
         <dt class="col-sm-3">Время</dt>
         <dd class="col-sm-9">{{ time }}</dd>
@@ -139,12 +144,20 @@
                                     </figcaption>
                                 </figure>
                             </div>
+                            {% if review.id_reviewer.id_user == id_const %}
+                                <a href="{% url 'platform_working:delete_review_on_song' song.id_song %}">
+                                    <button type="button" class="btn btn-danger">Удалить</button>
+                                </a>
+                            {% endif %}
                         </li>
                         <li></li>
                     {% endfor %}
                 </ul>
             {% else %}
                 Отзывов пока нет, будьте первыми!
+                <a href="{% url 'platform_working:create_review_on_song' song.id_song %}">
+                    <button type="button" class="btn btn-success">Добавить отзыв</button>
+                </a>
             {% endif %}
         </dd>
     </dl>

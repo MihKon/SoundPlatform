@@ -106,3 +106,71 @@ class AddAlbumForm(forms.ModelForm):
             'date': forms.DateInput(attrs={'type': 'date'}),
             'description': forms.Textarea(attrs={'class': 'form-control'})
         }
+
+
+class UpdateAlbumForm(forms.ModelForm):
+    class Meta:
+        model = Albums
+        fields = ['album_title', 'genre', 'description', 'number_of_songs']
+        widgets = {
+            'album_title': forms.TextInput(attrs={'class': 'form-control'}),
+            'number_of_songs': forms.NumberInput(attrs={'class': 'form-control'}),
+            'genre': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control'})
+        }
+
+
+class AddPlaylistForm(forms.ModelForm):
+    class Meta:
+        model = Playlists
+        fields = ['playlist_title']
+        widgets = {
+            'playlist_title': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+
+class UpdatePlaylistForm(forms.ModelForm):
+    class Meta:
+        model = Playlists
+        fields = ['playlist_title']
+        widgets = {
+            'playlist_title': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+
+class AddRepostForm(forms.ModelForm):
+    class Meta:
+        model = Reposts
+        fields = ['text']
+        widgets = {
+            'text': forms.Textarea(attrs={'class': 'form-control'})
+        }
+
+
+class AddGroupForm(forms.ModelForm):
+    class Meta:
+        model = Groups
+        fields = ['group_title', 'description']
+        widgets = {
+            'group_title': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control'})
+        }
+
+
+class UpdateGroupForm(forms.ModelForm):
+    class Meta:
+        model = Groups
+        fields = ['group_title', 'description']
+        widgets = {
+            'group_title': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control'})
+        }
+
+
+class AddReviewForm(forms.ModelForm):
+    class Meta:
+        model = Reviews
+        fields = ['text']
+        widgets = {
+            'text': forms.Textarea(attrs={'class': 'form-control'})
+        }

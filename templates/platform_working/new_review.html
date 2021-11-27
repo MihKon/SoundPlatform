@@ -40,7 +40,7 @@
         </div>
     </nav>
 </header>
-<form action="{% url 'platform_working:index' %}" method="post">
+<form action="{% url 'platform_working:create_review_on_user' user %}" method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit" class="btn btn-primary">Добавить</button>

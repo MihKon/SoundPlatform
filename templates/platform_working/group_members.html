@@ -62,6 +62,14 @@
         <a href="{% url 'platform_working:create_sub_on_group' id_g %}">
             <button type="button" class="btn btn-success">Подписаться</button>
         </a>
+        <a href="{% url 'platform_working:delete_sub_on_group' id_g %}">
+            <button type="button" class="btn btn-danger">Отписаться</button>
+        </a>
+    {% endif %}
+    {% if id_g %}
+        <a href="{% url 'platform_working:update_group' id_g %}">
+            <button type="button" class="btn btn-info">Изменить</button>
+        </a>
     {% endif %}
     <ul class="list-unstyled">
         <h4>Подписчики: </h4>

@@ -55,6 +55,14 @@
         </div>
     {% endif %}
 </header>
+{% if id_const %}
+    <a href="{% url 'platform_working:delete_playlist' pl_id %}">
+        <button type="button" class="btn btn-danger" onclick="alert('Вы удалили плейлист')">Удалить</button>
+    </a>
+    <a href="{% url 'platform_working:update_playlist' pl_id %}">
+        <button type="button" class="btn btn-info">Изменить</button>
+    </a>
+{% endif %}
 {% if playlist %}
     <table class="table table-hover">
         <thead>
